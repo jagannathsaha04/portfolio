@@ -1,0 +1,12 @@
+# frontend
+frontend/node_modules
+frontend/.next
+
+# backend
+backend/target
+
+# general
+node_modules
+.next
+.env
+.DS_Store
