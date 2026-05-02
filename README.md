@@ -1,6 +1,6 @@
 # Jagannath Saha — Portfolio
 
-A minimalist, terminal-inspired developer portfolio built with **Next.js 14** (App Router, TypeScript, Tailwind CSS) and a **Spring Boot** backend for the GitHub repos section.
+A minimalist, terminal-inspired developer portfolio built with **Next.js 14** (App Router, TypeScript, Tailwind CSS).
 
 ---
 
@@ -10,6 +10,9 @@ A minimalist, terminal-inspired developer portfolio built with **Next.js 14** (A
 portfolio/
 ├── frontend/              # Next.js 14 App Router
 │   ├── app/
+│   │   ├── api/
+│   │   │   └── repos/     # Next.js API route to fetch & rank repos
+│   │   │       └── route.ts
 │   │   ├── layout.tsx     # Root layout + metadata
 │   │   └── page.tsx       # Single-page composition
 │   ├── components/
@@ -26,25 +29,9 @@ portfolio/
 │   │   └── github.ts      # Repo fetch + timeAgo util
 │   ├── styles/
 │   │   └── globals.css
-│   ├── next.config.js     # Proxies /api/* → :8080
+│   ├── next.config.js
 │   ├── tailwind.config.ts
 │   └── package.json
-│
-└── backend/               # Spring Boot 3.2, Java 21
-    └── src/main/java/com/jagannath/portfolio/
-        ├── PortfolioApplication.java
-        ├── controller/
-        │   └── RepoController.java    # GET /api/repos
-        ├── service/
-        │   └── RepoService.java       # Filter + rank logic
-        ├── client/
-        │   └── GitHubClient.java      # GitHub REST API calls
-        ├── model/
-        │   ├── GitHubRepo.java        # Raw GitHub API shape
-        │   └── RepoResponse.java      # Response DTO
-        └── config/
-            ├── WebConfig.java         # CORS
-            └── CacheConfig.java       # Caffeine 1hr cache
 ```
 
 ---
@@ -53,34 +40,10 @@ portfolio/
 
 ### Prerequisites
 - Node.js 18+
-- Java 21 + Maven 3.9+
 
 ---
 
-### 1. Start the Spring Boot Backend
-
-```bash
-cd portfolio/backend
-mvn spring-boot:run
-```
-
-The API starts on **http://localhost:8080**
-
-**Optional:** Set a GitHub token to avoid rate limits:
-```bash
-export GITHUB_TOKEN=ghp_yourtoken
-mvn spring-boot:run
-```
-
-**Endpoint:**
-```
-GET http://localhost:8080/api/repos
-```
-Returns top repos (no forks, no empty), ranked by stars × 3 + recency score, cached for 1 hour.
-
----
-
-### 2. Start the Next.js Frontend
+### Start the Next.js Frontend
 
 ```bash
 cd portfolio/frontend
@@ -90,7 +53,11 @@ npm run dev
 
 Opens at **http://localhost:3000**
 
-`next.config.js` proxies all `/api/*` requests to `http://localhost:8080/api/*` automatically — no CORS issues in development.
+**Optional:** Set a GitHub token to avoid rate limits:
+```bash
+export GITHUB_TOKEN=ghp_yourtoken
+npm run dev
+```
 
 ---
 
@@ -132,9 +99,8 @@ recencyScore = max(0, 10 - (daysSinceUpdate / 30))
 |---|---|
 | Single-page layout | Portfolio is a scanning experience, not navigation |
 | Terminal aesthetic | Reflects developer identity; no gratuitous UI |
-| Spring Boot backend | Only where meaningful: caching, ranking, token auth |
-| `next.config.js` proxy | Avoids CORS config in dev; matches prod reverse-proxy pattern |
-| Caffeine cache (1hr) | GitHub API has rate limits; repos don't change frequently |
+| Next.js API Route | Replaced Spring Boot to minimize infrastructure and unify the tech stack |
+| Next.js fetch caching | GitHub API has rate limits; repos don't change frequently |
 | No database | Portfolio data is static; over-engineering would be dishonest |
 | SSE in LearnLite | Simpler than WebSockets for unidirectional LLM streaming |
 
@@ -144,15 +110,8 @@ recencyScore = max(0, 10 - (daysSinceUpdate / 30))
 
 **Frontend:** Vercel (zero config for Next.js)
 ```bash
+cd frontend
 vercel deploy
 ```
 
-**Backend:** Railway / Render / any JVM host
-```bash
-mvn clean package
-java -jar target/portfolio-1.0.0.jar
-```
-
 Set env var `GITHUB_TOKEN` on your hosting platform for higher GitHub API rate limits.
-
-Update `CORS` origins in `WebConfig.java` and `RepoController.java` to your production domain.

@@ -10,7 +10,7 @@ export interface Repo {
 }
 
 export async function fetchRepos(): Promise<Repo[]> {
-  const res = await fetch('/api/repos', { next: { revalidate: 3600 } })
+  const res = await fetch('/api/repos')
   if (!res.ok) throw new Error('Failed to fetch repos')
   return res.json()
 }

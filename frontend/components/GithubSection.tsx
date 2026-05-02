@@ -21,7 +21,7 @@ export default function GithubSection() {
 
       <div className="flex items-center gap-2 text-[12px] text-[#8b949e] mb-4">
         <span className="w-1.5 h-1.5 rounded-full bg-[#3fb950] inline-block animate-pulse" />
-        fetching from Spring Boot backend → GET /api/repos
+        fetching from Next.js API route → GET /api/repos
       </div>
 
       <div className="border border-[#30363d] rounded-lg overflow-hidden">
@@ -38,7 +38,7 @@ export default function GithubSection() {
         )}
         {error && (
           <div className="px-5 py-4 text-[12px] text-[#f85149]">
-            // error: could not reach backend. ensure Spring Boot is running on :8080
+            // error: could not fetch repositories.
           </div>
         )}
         {!loading && !error && repos.map((r, i) => (
